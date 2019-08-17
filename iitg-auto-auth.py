@@ -14,6 +14,7 @@ class Account:
     #   3. default?
     pass
 
+
 data = {
     '4Tredir': "https://agnigarh.iitg.ac.in:1442/login?",
     'magic': "",
@@ -44,6 +45,8 @@ class AgnigarhHandler:
     '''
 
     def __init__(self):
+        # TODO: read URLS and other configuration settings from .conf or .json configuration file
+
         self.base_url = "https://agnigarh.iitg.ac.in:1442/"
         self.login_url = self.base_url + "login??"
         self.keepalive_url = self.base_url + "keepalive?"
@@ -65,14 +68,30 @@ class AgnigarhHandler:
         # self.curr_session.headers = self.custom_headers
         self.curr_session.verify = "./iitg_ac_in.crt"
         # self.curr_session.max_redirects = 0
-    
+
+        # TODO: implement retry functionality from http://stackoverflow.com/a/35504626/401467
+
     def get_logout(self):
         url_used = self.logout_url
-        resp = self.curr_session.get(url_used, allow_redirects=False)
-        if resp.ok:
-            return True
+        try:
+            resp = self.curr_session.get(url_used, allow_redirects=False, timeout=10)
+            resp.raise_for_status()
+        except ConnectionError:
+            pass
+            # TODO: write to log and exit
+        except requests.exceptions.HTTPError:
+            pass
+            # TODO: write to log and exit
+        except TimeoutError:
+            pass
+            # TODO: write to log and exit
+        except:
+            pass
+            # TODO: write to log and exit
         else:
-            raise AssertionError("Could not logout. Server responded with status code {} to URL {}.".format(resp.status_code, url_used))
+            return True
+            
+            # raise AssertionError("Could not logout. Server responded with status code {} to URL {}.".format(resp.status_code, url_used))
 
     def get_login(self):
         pass
@@ -84,8 +103,7 @@ class AgnigarhHandler:
         pass
 
 
-
 if __name__ == "__main__":
-    print('Data for POST request:', data)
+    # print('Data for POST request:', data)
     net = AgnigarhHandler()
     net.get_logout()
