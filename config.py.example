@@ -1,9 +1,28 @@
 # Rename file to config.py before use.
 
 conf = {}
+
 conf['base_url'] = ""
 conf['login_url'] = ""
 conf['keepalive_url'] = ""
 conf['logout_url'] = ""
+
+
+conf['certificate_path'] = "./certificates/iitg_ac_in.crt"  # "" to disable verification of SSL certificate.
+
+conf['use_custom_headers'] = ""    # "" for default headers.
+conf['empty_headers'] = {}
+conf['mozilla_headers'] = {
+    'Host': 'agnigarh.iitg.ac.in:1442',
+    'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.5',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'DNT': '1',
+    'Connection': 'keep-alive',
+    'Upgrade-Insecure-Requests': '1',
+    'Pragma': 'no-cache',
+    'Cache-Control': 'no-cache'
+}
 
 # TODO: make config.py.example build automatically from config.py

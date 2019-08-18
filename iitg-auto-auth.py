@@ -5,7 +5,7 @@ import requests
 import sys
 import getpass
 import os
-
+import config
 
 class Account:
     # Attributes
@@ -47,27 +47,21 @@ class AgnigarhHandler:
     def __init__(self):
         # TODO: read URLS and other configuration settings from .conf or .json configuration file
 
-        self.base_url = "https://agnigarh.iitg.ac.in:1442/"
-        self.login_url = self.base_url + "login??"
-        self.keepalive_url = self.base_url + "keepalive?"
-        self.logout_url = self.base_url + "logout??"
+        self.base_url = config.conf['base_url']
+        self.login_url = config.conf['login_url']
+        self.keepalive_url = config.conf['keepalive_url']
+        self.logout_url = config.conf['logout_url']
 
         self.curr_session = requests.Session()
-        self.custom_headers = {
-            'Host': 'agnigarh.iitg.ac.in:1442',
-            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.5',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'DNT': '1',
-            'Connection': 'keep-alive',
-            'Upgrade-Insecure-Requests': '1',
-            'Pragma': 'no-cache',
-            'Cache-Control': 'no-cache'
-        }
-        # self.curr_session.headers = self.custom_headers
-        self.curr_session.verify = "./iitg_ac_in.crt"
-        # self.curr_session.max_redirects = 0
+        
+        if config.conf['use_custom_headers']:
+            self.custom_headers = config.conf[config.conf['use_custom_headers']]
+            self.curr_session.headers = self.custom_headers
+        
+        if config.conf['certificate_path']:
+            self.curr_session.verify = config.conf['certificate_path']
+        else:
+            self.curr_session.verify = False
 
         # TODO: implement retry functionality from http://stackoverflow.com/a/35504626/401467
 
@@ -89,6 +83,7 @@ class AgnigarhHandler:
             pass
             # TODO: write to log and exit
         else:
+            print(resp.request.headers)
             return True
             
             # raise AssertionError("Could not logout. Server responded with status code {} to URL {}.".format(resp.status_code, url_used))
