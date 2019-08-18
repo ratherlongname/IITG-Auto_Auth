@@ -5,7 +5,7 @@ import requests
 import sys
 import getpass
 import os
-import config
+from config import config
 
 class Account:
     # Attributes
@@ -45,21 +45,19 @@ class AgnigarhHandler:
     '''
 
     def __init__(self):
-        # TODO: read URLS and other configuration settings from .conf or .json configuration file
-
-        self.base_url = config.conf['base_url']
-        self.login_url = config.conf['login_url']
-        self.keepalive_url = config.conf['keepalive_url']
-        self.logout_url = config.conf['logout_url']
+        self.base_url = config['base_url']
+        self.login_url = config['login_url']
+        self.keepalive_url = config['keepalive_url']
+        self.logout_url = config['logout_url']
 
         self.curr_session = requests.Session()
-        
-        if config.conf['use_custom_headers']:
-            self.custom_headers = config.conf[config.conf['use_custom_headers']]
+
+        if config['use_custom_headers']:
+            self.custom_headers = config[config['use_custom_headers']]
             self.curr_session.headers = self.custom_headers
-        
-        if config.conf['certificate_path']:
-            self.curr_session.verify = config.conf['certificate_path']
+
+        if config['certificate_path']:
+            self.curr_session.verify = config['certificate_path']
         else:
             self.curr_session.verify = False
 
@@ -85,7 +83,7 @@ class AgnigarhHandler:
         else:
             print(resp.request.headers)
             return True
-            
+
             # raise AssertionError("Could not logout. Server responded with status code {} to URL {}.".format(resp.status_code, url_used))
 
     def get_login(self):
