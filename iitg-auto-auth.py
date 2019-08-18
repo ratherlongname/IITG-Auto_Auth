@@ -8,6 +8,7 @@ import os
 from config import config
 from urllib3.util.retry import Retry
 import urllib3
+import re
 
 class Account:
     # Attributes
@@ -76,31 +77,18 @@ class AgnigarhHandler:
     def get_logout(self):
         try:
             self.curr_session.get(self.logout_url, allow_redirects=False, timeout=10)
-        #except urllib3.exceptions.MaxRetryError as e:
-        #    print(e)
-        #except requests.exceptions.RequestException as e:
-        #    print(e)
-        #except ConnectionError:
-        #    pass
-            # TODO: write to log and exit
-        #except requests.exceptions.HTTPError:
-        #    pass
-            # TODO: write to log and exit
-        #except TimeoutError:
-        #    pass
-            # TODO: write to log and exit
-        #except:
-        #    pass
-            # TODO: write to log and exit
         except Exception as e:
             print(e)
         else:
             return True
-            # raise AssertionError("Could not logout. Server responded with status code {} to URL {}.".format(resp.status_code, url_used))
 
     def get_login(self):
-        pass
-        # self.curr_session.get()
+        try:
+            resp = self.curr_session.get(self.login_url, timeout=10)
+        except Exception as e:
+            print(e)
+        else:
+            return self.extract_login_magic(resp.text)
 
     def get_keep_alive(self, magic):
         pass
@@ -108,7 +96,13 @@ class AgnigarhHandler:
     def post_base_url(self, data):
         pass
 
+    def extract_login_magic(self, login_text):
+        # TODO: complete this function.
+        print((login_text))
+        p = re.compile('<input type="hidden" name="magic" value="(?P<login_magic>[a-z0-9]*)">')
+        login_magic = (p.search(login_text)).group('login_magic')
+        return login_magic
+
 
 if __name__ == "__main__":
     net = AgnigarhHandler()
-    net.get_logout()
