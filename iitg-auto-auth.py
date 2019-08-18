@@ -6,6 +6,8 @@ import sys
 import getpass
 import os
 from config import config
+from urllib3.util.retry import Retry
+import urllib3
 
 class Account:
     # Attributes
@@ -61,24 +63,31 @@ class AgnigarhHandler:
         else:
             self.curr_session.verify = False
 
-        # TODO: implement retry functionality from http://stackoverflow.com/a/35504626/401467
+        retries = Retry(total = 5,
+                        backoff_factor = 0.5,
+                        status_forcelist = [x for x in range(400, 600)],
+                        raise_on_status = True)
+        self.curr_session.mount('https://', requests.adapters.HTTPAdapter(max_retries = retries))
 
     def get_logout(self):
         url_used = self.logout_url
         try:
             resp = self.curr_session.get(url_used, allow_redirects=False, timeout=10)
-            resp.raise_for_status()
-        except ConnectionError:
-            pass
+        except urllib3.exceptions.MaxRetryError as e:
+            print(e)
+        except requests.exceptions.RequestException as e:
+            print(e)
+        #except ConnectionError:
+        #    pass
             # TODO: write to log and exit
-        except requests.exceptions.HTTPError:
-            pass
+        #except requests.exceptions.HTTPError:
+        #    pass
             # TODO: write to log and exit
-        except TimeoutError:
-            pass
+        #except TimeoutError:
+        #    pass
             # TODO: write to log and exit
-        except:
-            pass
+        #except:
+        #    pass
             # TODO: write to log and exit
         else:
             print(resp.request.headers)
