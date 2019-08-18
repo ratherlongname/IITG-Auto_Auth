@@ -1,0 +1,5 @@
+conf = {}
+conf['base_url'] = ""
+conf['login_url'] = ""
+conf['keepalive_url'] = ""
+conf['logout_url'] = ""
