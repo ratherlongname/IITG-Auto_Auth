@@ -1,18 +1,18 @@
 # Rename file to config.py before use.
 
-conf = {}
+config = {}
 
-conf['base_url'] = ""
-conf['login_url'] = ""
-conf['keepalive_url'] = ""
-conf['logout_url'] = ""
+config['base_url'] = ""
+config['login_url'] = ""
+config['keepalive_url'] = ""
+config['logout_url'] = ""
 
 
-conf['certificate_path'] = "./certificates/iitg_ac_in.crt"  # "" to disable verification of SSL certificate.
+config['certificate_path'] = "./certificates/iitg_ac_in.crt"  # "" to disable verification of SSL certificate.
 
-conf['use_custom_headers'] = ""    # "" for default headers.
-conf['empty_headers'] = {}
-conf['mozilla_headers'] = {
+config['use_custom_headers'] = ""    # "" for default headers.
+config['empty_headers'] = {}
+config['mozilla_headers'] = {
     'Host': 'agnigarh.iitg.ac.in:1442',
     'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
