@@ -25,4 +25,12 @@ config['mozilla_headers'] = {
     'Cache-Control': 'no-cache'
 }
 
+config['retry_profile'] = "default_profile" # "" for default retry behaviour of requests python package.
+config['default_profile'] = {
+    'total': 5,
+    'backoff_factor': 0.5,
+    'status_forcelist': [x for x in range(400, 600)],
+    'raise_on_status': True
+}
+
 # TODO: make config.py.example build automatically from config.py

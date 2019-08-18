@@ -54,8 +54,8 @@ class AgnigarhHandler:
 
         self.curr_session = requests.Session()
 
-        if config['use_custom_headers']:
-            self.custom_headers = config[config['use_custom_headers']]
+        if config['custom_headers']:
+            self.custom_headers = config[config['custom_headers']]
             self.curr_session.headers = self.custom_headers
 
         if config['certificate_path']:
@@ -63,10 +63,14 @@ class AgnigarhHandler:
         else:
             self.curr_session.verify = False
 
-        retries = Retry(total = 5,
-                        backoff_factor = 0.5,
-                        status_forcelist = [x for x in range(400, 600)],
-                        raise_on_status = True)
+        if config['retry_profile']:
+            retry_config = config[config['retry_profile']]
+            retries = Retry(total = retry_config['total'],
+                            backoff_factor = retry_config['backoff_factor'],
+                            status_forcelist = retry_config['status_forcelist'],
+                            raise_on_status = retry_config['raise_on_status'])
+        else:
+            retries = Retry()
         self.curr_session.mount('https://', requests.adapters.HTTPAdapter(max_retries = retries))
 
     def get_logout(self):
