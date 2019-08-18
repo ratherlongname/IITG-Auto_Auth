@@ -1,5 +1,9 @@
+# Rename file to config.py before use.
+
 conf = {}
 conf['base_url'] = ""
 conf['login_url'] = ""
 conf['keepalive_url'] = ""
 conf['logout_url'] = ""
+
+# TODO: make config.py.example build automatically from config.py
