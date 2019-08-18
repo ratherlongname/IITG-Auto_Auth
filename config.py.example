@@ -6,7 +6,7 @@ config['base_url'] = ""
 config['login_url'] = ""
 config['keepalive_url'] = ""
 config['logout_url'] = ""
-
+config['4Tredir_url'] = config['login_url']
 
 config['certificate_path'] = "./certificates/iitg_ac_in.crt"  # "" to disable verification of SSL certificate.
 

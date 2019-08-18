@@ -10,31 +10,6 @@ from urllib3.util.retry import Retry
 import urllib3
 import re
 
-class Account:
-    # Attributes
-    #   1. username
-    #   2. password
-    #   3. default?
-    pass
-
-
-data = {
-    '4Tredir': "https://agnigarh.iitg.ac.in:1442/login?",
-    'magic': "",
-}
-
-try:
-    data['username'] = os.environ['IITG_USERNAME']
-except KeyError as e:
-    print("IITG_USERNAME environment variable is not set.")
-    data['username'] = input("Username: ")
-
-try:
-    data['password'] = os.environ['IITG_PASSWORD']
-except KeyError as e:
-    print("IITG_PASSWORD environment variable is not set.")
-    data['password'] = getpass.getpass()
-
 
 class AgnigarhHandler:
     ''' Interface to make requests to the IITG login server.
@@ -78,6 +53,7 @@ class AgnigarhHandler:
         try:
             self.curr_session.get(self.logout_url, allow_redirects=False, timeout=10)
         except Exception as e:
+            # TODO: write e to log along with info if it is caused due to client, server or this programme
             print(e)
         else:
             return True
@@ -86,23 +62,61 @@ class AgnigarhHandler:
         try:
             resp = self.curr_session.get(self.login_url, timeout=10)
         except Exception as e:
+            # TODO: write e to log along with info if it is caused due to client, server or this programme
             print(e)
         else:
-            return self.extract_login_magic(resp.text)
-
-    def get_keep_alive(self, magic):
-        pass
+            try:
+                login_magic = self.extract_login_magic(resp.text)
+            except AssertionError as e:
+                print(e)
+                raise
+                # TODO: retry get_login()
+            else:
+                return login_magic
 
     def post_base_url(self, data):
         pass
 
-    def extract_login_magic(self, login_text):
-        # TODO: complete this function.
-        print((login_text))
-        p = re.compile('<input type="hidden" name="magic" value="(?P<login_magic>[a-z0-9]*)">')
-        login_magic = (p.search(login_text)).group('login_magic')
-        return login_magic
+    def get_keep_alive(self, magic):
+        pass
 
+    def extract_login_magic(self, login_text):
+        pattern = re.compile('<input type="hidden" name="magic" value="(?P<login_magic>[a-z0-9]*)">')
+
+        match = pattern.search(login_text)
+        if match:
+            return match.group('login_magic')
+        else:
+            raise AssertionError("Login page does not contain magic value. Login page received:\n{}".format(login_text))
+
+    def build_form_data(self, login_magic):
+        data = {}
+        data['4Tredir'] = config['4Tredir_url']
+        data['magic'] = login_magic
+
+        # TODO: don't read username, pw from env variables. read from file. maybe gnome keychain?
+        try:
+            data['username'] = os.environ['IITG_USERNAME']
+        except KeyError:
+            print("IITG_USERNAME environment variable is not set.")
+            data['username'] = input("Username: ")
+
+        try:
+            data['password'] = os.environ['IITG_PASSWORD']
+        except KeyError:
+            print("IITG_PASSWORD environment variable is not set.")
+            data['password'] = getpass.getpass()
+        return data
 
 if __name__ == "__main__":
     net = AgnigarhHandler()
+    net.get_logout()
+    login_magic = net.get_login()
+    print("login_magic received:", login_magic)
+    data = net.build_form_data(login_magic)
+    try:
+        net.post_base_url(data)
+    except AssertionError as e:
+        print(e)    # invalid username or pw
+        # TODO: ask for correct credentials
+        # TODO: retry POST or go to get_logout()
