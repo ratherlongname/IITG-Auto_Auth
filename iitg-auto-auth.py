@@ -74,13 +74,12 @@ class AgnigarhHandler:
         self.curr_session.mount('https://', requests.adapters.HTTPAdapter(max_retries = retries))
 
     def get_logout(self):
-        url_used = self.logout_url
         try:
-            resp = self.curr_session.get(url_used, allow_redirects=False, timeout=10)
-        except urllib3.exceptions.MaxRetryError as e:
-            print(e)
-        except requests.exceptions.RequestException as e:
-            print(e)
+            self.curr_session.get(self.logout_url, allow_redirects=False, timeout=10)
+        #except urllib3.exceptions.MaxRetryError as e:
+        #    print(e)
+        #except requests.exceptions.RequestException as e:
+        #    print(e)
         #except ConnectionError:
         #    pass
             # TODO: write to log and exit
@@ -93,14 +92,15 @@ class AgnigarhHandler:
         #except:
         #    pass
             # TODO: write to log and exit
+        except Exception as e:
+            print(e)
         else:
-            print(resp.request.headers)
             return True
-
             # raise AssertionError("Could not logout. Server responded with status code {} to URL {}.".format(resp.status_code, url_used))
 
     def get_login(self):
         pass
+        # self.curr_session.get()
 
     def get_keep_alive(self, magic):
         pass
@@ -110,6 +110,5 @@ class AgnigarhHandler:
 
 
 if __name__ == "__main__":
-    # print('Data for POST request:', data)
     net = AgnigarhHandler()
     net.get_logout()
