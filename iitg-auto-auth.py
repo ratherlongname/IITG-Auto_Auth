@@ -97,15 +97,38 @@ class AgnigarhHandler:
         # TODO: don't read username, pw from env variables. read from file. maybe gnome keychain?
         try:
             data['username'] = os.environ['IITG_USERNAME']
+            if not data['username']:
+                raise KeyError
         except KeyError:
-            print("IITG_USERNAME environment variable is not set.")
-            data['username'] = input("Username: ")
+            print("IITG_USERNAME environment variable is not set")
+            try:
+                data['username'] = config['IITG_USERNAME']
+                if not data['username']:
+                    raise KeyError
+            except KeyError:
+                print("IITG_USERNAME not set in config.py")
+                try:
+                    data['username'] = input("Username: ")
+                except EOFError:
+                    data['username'] = ""
 
         try:
             data['password'] = os.environ['IITG_PASSWORD']
+            if not data['password']:
+                raise KeyError
         except KeyError:
-            print("IITG_PASSWORD environment variable is not set.")
-            data['password'] = getpass.getpass()
+            print("IITG_PASSWORD environment variable is not set")
+            try:
+                data['password'] = config['IITG_PASSWORD']
+                if not data['password']:
+                    raise KeyError
+            except KeyError:
+                print("IITG_PASSWORD not set in config.py")
+                try:
+                    data['password'] = getpass.getpass()
+                except EOFError:
+                    data['password'] = ""
+
         return data
 
 if __name__ == "__main__":
@@ -114,6 +137,7 @@ if __name__ == "__main__":
     login_magic = net.get_login()
     print("login_magic received:", login_magic)
     data = net.build_form_data(login_magic)
+    print(data)
     try:
         net.post_base_url(data)
     except AssertionError as e:

@@ -2,6 +2,9 @@
 
 config = {}
 
+config['IITG_USERNAME'] = ""
+config['IITG_PASSWORD'] = ""
+
 config['base_url'] = ""
 config['login_url'] = ""
 config['keepalive_url'] = ""
