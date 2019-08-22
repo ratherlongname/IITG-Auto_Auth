@@ -31,7 +31,7 @@ class AgnigarhHandler:
         self.curr_session = requests.Session()
 
         if config['custom_headers']:
-            self.custom_headers = config[config['custom_headers']]
+            self.custom_headers = config['custom_headers']
             self.curr_session.headers = self.custom_headers
 
         if config['certificate_path']:
