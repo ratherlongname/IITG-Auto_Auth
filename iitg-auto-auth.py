@@ -9,7 +9,7 @@ from config import config
 from urllib3.util.retry import Retry
 import urllib3
 import re
-
+from time import sleep
 
 class AgnigarhHandler:
     ''' Interface to make requests to the IITG login server.
@@ -75,10 +75,32 @@ class AgnigarhHandler:
                 return login_magic
 
     def post_base_url(self, data):
-        pass
+        try:
+            resp = self.curr_session.post(self.base_url, data=data, allow_redirects=False, timeout=10)
+        except Exception as e:
+            print(e)
+        else:
+            keepalive_magic = self.extract_keepalive_magic(resp.text)
+            return keepalive_magic
 
     def get_keep_alive(self, magic):
-        pass
+        try:
+            self.curr_session.get(self.keepalive_url + magic, allow_redirects=False, timeout=10)
+        except Exception as e:
+            # TODO: write e to log along with info if it is caused due to client, server or this programme
+            print(e)
+        else:
+            return True
+    
+    def extract_keepalive_magic(self, post_text):
+        pattern = re.compile('keepalive[?](?P<keepalive_magic>[a-z0-9]*)')
+
+        match = pattern.search(post_text)
+        if match:
+            return match.group('keepalive_magic')
+        else:
+            raise AssertionError("POST did not return magic value. Response received:\n{}".format(post_text))
+
 
     def extract_login_magic(self, login_text):
         pattern = re.compile('<input type="hidden" name="magic" value="(?P<login_magic>[a-z0-9]*)">')
@@ -138,9 +160,9 @@ if __name__ == "__main__":
     print("login_magic received:", login_magic)
     data = net.build_form_data(login_magic)
     print(data)
-    try:
-        net.post_base_url(data)
-    except AssertionError as e:
-        print(e)    # invalid username or pw
-        # TODO: ask for correct credentials
-        # TODO: retry POST or go to get_logout()
+    keepalive_magic = net.post_base_url(data)
+    while True:
+        if net.get_keep_alive(keepalive_magic):
+            print("keepalive successful!")
+        sleep(500)
+    
