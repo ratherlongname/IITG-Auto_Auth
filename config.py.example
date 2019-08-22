@@ -13,7 +13,7 @@ config['4Tredir_url'] = config['login_url']
 
 config['certificate_path'] = "./certificates/iitg_ac_in.crt"  # "" to disable verification of SSL certificate.
 
-config['use_custom_headers'] = ""    # "" for default headers.
+config['custom_headers'] = ""    # "" for default headers.
 config['empty_headers'] = {}
 config['mozilla_headers'] = {
     'Host': 'agnigarh.iitg.ac.in:1442',
