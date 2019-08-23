@@ -101,7 +101,7 @@ class AgnigarhHandler:
             print(e)
         else:
             return True
-    
+
     def extract_keepalive_magic(self, post_text):
         pattern = re.compile('keepalive[?](?P<keepalive_magic>[a-z0-9]*)')
 
@@ -164,21 +164,7 @@ class AgnigarhHandler:
         return data
 
 if __name__ == "__main__":
-    # net = AgnigarhHandler()
-    # net.get_logout()
-    # login_magic = net.get_login()
-    # print("login_magic received:", login_magic)
-    # data = net.build_form_data(login_magic)
-    # print(data)
-    # keepalive_magic = net.post_base_url(data)
-    # while True:
-    #     if net.get_keep_alive(keepalive_magic):
-    #         print("keepalive successful!")
-    #     sleep(500)
-
-
     # TODO: restructure programme to handle exceptions here.
-    # instantiate AgnigarhHandler
     try:
         net = AgnigarhHandler()
     except KeyError as e:
@@ -186,16 +172,44 @@ if __name__ == "__main__":
         print(e)
         sys.exit()
 
-    while True:
-        try:
-            net.get_logout()
-        except (requests.ConnectTimeout) as e:
-            print(e)
-            print("There seems to be some problem in the connection between {} and this client.".format(net.base_url))
-            print("Check if you are connected to IITG network.")
-            sys.exit()
-        except (requests.ReadTimeout) as e:
-            print(e)
-            print("There seems to be some problem with {}.".format(net.base_url))
-            print("Try reconnecting later.")
-            sys.exit()
+    try:
+        net.get_logout()
+    except (requests.ConnectTimeout) as e:
+        print(e)
+        print("There seems to be some problem in the connection between {} and this client.".format(net.base_url))
+        print("Check if you are connected to IITG network.")
+        sys.exit()
+
+    except (requests.ReadTimeout) as e:
+        print(e)
+        print("There seems to be some problem with {}.".format(net.base_url))
+        print("Try reconnecting later.")
+        sys.exit()
+    except:
+        # TODO: handle exceptions (print to screen)
+        sys.exit()
+
+
+    try:
+        login_magic = net.get_login()
+    except:
+        # TODO: handle exceptions (print to screen)
+        sys.exit()
+
+    try:
+        data = net.build_form_data(login_magic)
+    except:
+        # TODO: handle exceptions (print to screen)
+        sys.exit()
+
+    try:
+        keepalive_magic = net.post_base_url(data)
+    except:
+        # TODO: handle exceptions (print to screen)
+        sys.exit()
+
+    while(True):
+        keepalive_success = net.get_keep_alive(keepalive_magic)
+        if not keepalive_success:
+            break
+        sleep(500)
