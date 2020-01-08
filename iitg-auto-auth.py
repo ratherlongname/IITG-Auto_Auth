@@ -11,6 +11,20 @@ from urllib3.util.retry import Retry
 import urllib3
 import re
 from time import sleep
+import keyring
+
+class PasswordManager:
+    ''' Interface to handle passwords and credentials.
+
+    Keyword arguments:
+    None
+
+    Returns:
+    Instance of self
+    '''
+    def __init__(self):
+        print("get_keyring = ", keyring.get_keyring())
+
 
 class AgnigarhHandler:
     ''' Interface to make requests to the IITG login server.
@@ -165,6 +179,10 @@ class AgnigarhHandler:
 
 if __name__ == "__main__":
     # TODO: restructure programme to handle exceptions here.
+    
+    test = PasswordManager()
+    sys.exit()
+
     try:
         net = AgnigarhHandler()
     except KeyError as e:
